@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from PIL import Image
@@ -24,7 +24,7 @@ from app.infrastructure.ocr.base import OCREngine, OCRResult
 from app.infrastructure.pdf.processor import PDFProcessor
 
 
-class PipelineStrategy(str, Enum):
+class PipelineStrategy(StrEnum):
     OCR_LLM = "ocr_llm"
     VISION_LLM = "vision_llm"
     HYBRID = "hybrid"
