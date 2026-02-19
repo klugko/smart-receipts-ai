@@ -78,7 +78,7 @@ Key settings in `.env`:
 ### Running with Docker (Recommended)
 
 ```bash
-docker-compose up -d
+docker-compose up --build
 
 docker-compose logs -f app
 ```
@@ -234,9 +234,40 @@ The optional provider database improves extraction quality by:
 3. Enriching extracted data with stored information
 4. Learning new providers from successful extractions
 
+## Dataset
+
+The `receipts/` directory contains the [Kaggle Receipts Dataset](https://www.kaggle.com/datasets/jenswalter/receipts/data) used for development and evaluation.
+
+### Structure
+
+```
+receipts/
+├── 2017/
+│   └── de/public transport/    # German transport tickets
+├── 2018/
+│   ├── ca/hotel/               # Canadian hotel receipts
+│   ├── cn/cafe/                # Chinese cafe receipts
+│   └── de/
+│       ├── cafe/               # German cafe receipts (Starbucks)
+│       ├── hotel/              # German hotel receipts (Madison, Ibis)
+│       └── public transport/   # German railway tickets (Deutsche Bahn)
+├── 2019-2024/                  # Additional receipts by year/country
+└── index.txt                   # Dataset index
+```
+
+### Ground Truth Labels
+
+10 receipts have been manually labeled for evaluation in `evaluation/ground_truth.json`:
+
+| Category | Count | Countries |
+|----------|-------|-----------|
+| Hotels | 5 | DE, CA |
+| Cafes | 3 | DE, CN |
+| Public Transport | 2 | DE |
+
 ## Presentation
 
-See `docs/PRESENTATION.md` for slides covering:
+See `docs/PRESENTATION.pdf` (or `docs/PRESENTATION.md`) for slides covering:
 - Solution overview and architecture
 - Technical approach and pipeline design
 - Model evaluation results

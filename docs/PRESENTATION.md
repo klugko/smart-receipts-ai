@@ -255,7 +255,7 @@ smart-receipts-ai/
 ## Running the Project
 ```bash
 # With Docker
-docker-compose up -d
+docker-compose up --build
 
 # Local development
 pip install -r requirements.txt
