@@ -1,0 +1,223 @@
+{
+    "version": "1.0",
+    "description": "Ground truth labels for receipt extraction evaluation - 10 labeled documents",
+    "receipts": [
+        {
+            "id": "receipt_001",
+            "file_path": "receipts/2018/de/hotel/madison_484950.pdf",
+            "category": "hotel",
+            "country": "DE",
+            "language": "de",
+            "ground_truth": {
+                "service_provider": {
+                    "name": "MADISON Hotel GmbH",
+                    "address": "Schaarsteinweg 4, 20459 Hamburg, Germany",
+                    "vat_number": "DE118696407",
+                    "country": "DE",
+                    "phone": "+49 40 37666-0",
+                    "email": "info@madisonhotel.de"
+                },
+                "transaction": {
+                    "items": [
+                        {"name": "Ubernachtung exklusive Fruhstuck", "quantity": 5, "unit_price": 110.00, "total_price": 550.00, "vat_rate": 7.0},
+                        {"name": "Fruhstuck", "quantity": 1, "unit_price": 18.00, "total_price": 18.00, "vat_rate": 19.0}
+                    ],
+                    "currency": "EUR",
+                    "subtotal": 529.15,
+                    "total_amount": 568.00,
+                    "vat_details": [
+                        {"rate": 7.0, "net_amount": 514.02, "vat_amount": 35.98, "gross_amount": 550.00},
+                        {"rate": 19.0, "net_amount": 15.13, "vat_amount": 2.87, "gross_amount": 18.00}
+                    ],
+                    "payment_method": "Mastercard",
+                    "transaction_date": "2018-12-21",
+                    "invoice_number": "484950"
+                }
+            }
+        },
+        {
+            "id": "receipt_002",
+            "file_path": "receipts/2018/de/hotel/madison_484265.pdf",
+            "category": "hotel",
+            "country": "DE",
+            "language": "de",
+            "ground_truth": {
+                "service_provider": {
+                    "name": "MADISON Hotel GmbH",
+                    "address": "Schaarsteinweg 4, 20459 Hamburg, Germany",
+                    "vat_number": "DE118696407",
+                    "country": "DE"
+                },
+                "transaction": {
+                    "currency": "EUR",
+                    "total_amount": 0,
+                    "payment_method": "Mastercard",
+                    "invoice_number": "484265"
+                }
+            },
+            "notes": "Similar hotel receipt format"
+        },
+        {
+            "id": "receipt_003",
+            "file_path": "receipts/2018/de/cafe/starbucks-20181222_007.pdf",
+            "category": "cafe",
+            "country": "DE",
+            "language": "de",
+            "ground_truth": {
+                "service_provider": {
+                    "name": "Starbucks Coffee Deutschland GmbH",
+                    "country": "DE"
+                },
+                "transaction": {
+                    "currency": "EUR",
+                    "total_amount": 0,
+                    "items": []
+                }
+            },
+            "notes": "Cafe receipt - smaller items"
+        },
+        {
+            "id": "receipt_004",
+            "file_path": "receipts/2018/de/public transport/bahn-LGNSW7.pdf",
+            "category": "public_transport",
+            "country": "DE",
+            "language": "de",
+            "ground_truth": {
+                "service_provider": {
+                    "name": "Deutsche Bahn AG",
+                    "country": "DE",
+                    "vat_number": "DE811569869"
+                },
+                "transaction": {
+                    "currency": "EUR",
+                    "total_amount": 0,
+                    "items": []
+                }
+            },
+            "notes": "German railway ticket"
+        },
+        {
+            "id": "receipt_005",
+            "file_path": "receipts/2018/ca/hotel/20181024_008.pdf",
+            "category": "hotel",
+            "country": "CA",
+            "language": "en",
+            "ground_truth": {
+                "service_provider": {
+                    "country": "CA"
+                },
+                "transaction": {
+                    "currency": "CAD",
+                    "total_amount": 0
+                }
+            },
+            "notes": "Canadian hotel receipt"
+        },
+        {
+            "id": "receipt_006",
+            "file_path": "receipts/2018/de/hotel/20181024_Ibis Styles Konstanz.pdf",
+            "category": "hotel",
+            "country": "DE",
+            "language": "de",
+            "ground_truth": {
+                "service_provider": {
+                    "name": "Ibis Styles Konstanz",
+                    "country": "DE"
+                },
+                "transaction": {
+                    "currency": "EUR",
+                    "total_amount": 0
+                }
+            },
+            "notes": "Budget hotel chain receipt"
+        },
+        {
+            "id": "receipt_007",
+            "file_path": "receipts/2017/de/public transport/NGTGLY.pdf",
+            "category": "public_transport",
+            "country": "DE",
+            "language": "de",
+            "ground_truth": {
+                "service_provider": {
+                    "country": "DE"
+                },
+                "transaction": {
+                    "currency": "EUR",
+                    "total_amount": 0
+                }
+            },
+            "notes": "Public transport ticket 2017"
+        },
+        {
+            "id": "receipt_008",
+            "file_path": "receipts/2018/cn/cafe/20181024_007.pdf",
+            "category": "cafe",
+            "country": "CN",
+            "language": "zh",
+            "ground_truth": {
+                "service_provider": {
+                    "country": "CN"
+                },
+                "transaction": {
+                    "currency": "CNY",
+                    "total_amount": 0
+                }
+            },
+            "notes": "Chinese cafe receipt"
+        },
+        {
+            "id": "receipt_009",
+            "file_path": "receipts/2018/de/cafe/starbucks-15373.pdf",
+            "category": "cafe",
+            "country": "DE",
+            "language": "de",
+            "ground_truth": {
+                "service_provider": {
+                    "name": "Starbucks",
+                    "country": "DE"
+                },
+                "transaction": {
+                    "currency": "EUR",
+                    "total_amount": 0
+                }
+            },
+            "notes": "Starbucks Germany"
+        },
+        {
+            "id": "receipt_010",
+            "file_path": "receipts/2018/de/hotel/20180915_THE MADISON HAMBURG.pdf",
+            "category": "hotel",
+            "country": "DE",
+            "language": "de",
+            "ground_truth": {
+                "service_provider": {
+                    "name": "THE MADISON HAMBURG",
+                    "address": "Schaarsteinweg 4, 20459 Hamburg",
+                    "vat_number": "DE118696407",
+                    "country": "DE"
+                },
+                "transaction": {
+                    "currency": "EUR",
+                    "total_amount": 0,
+                    "payment_method": "Card"
+                }
+            },
+            "notes": "Madison Hotel September 2018"
+        }
+    ],
+    "statistics": {
+        "total_receipts": 10,
+        "by_country": {
+            "DE": 8,
+            "CA": 1,
+            "CN": 1
+        },
+        "by_category": {
+            "hotel": 5,
+            "cafe": 3,
+            "public_transport": 2
+        },
+        "fully_labeled": 1,
+        "partially_labeled": 9
+    }
+}
