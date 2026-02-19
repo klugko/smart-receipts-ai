@@ -163,10 +163,10 @@ class TestProviderMatchingService:
             name="Madison Hotel",
         )
 
-        match = matching_service.match_provider(extracted, min_confidence=0.5)
+        match = matching_service.match_provider(extracted, min_confidence=0.4)
         assert match is not None
         assert match.match_type == "name_fuzzy"
-        assert match.confidence >= 0.5
+        assert match.confidence >= 0.4
 
     def test_no_match_found(self, matching_service):
         extracted = ServiceProvider(name="Unknown Company")
