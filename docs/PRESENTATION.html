@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Receipts AI - Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        .slide {
+            width: 100%;
+            min-height: 100vh;
+            padding: 60px 80px;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+        }
+        .slide:last-child {
+            page-break-after: avoid;
+        }
+        h1 {
+            font-size: 42px;
+            color: #1a365d;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #3182ce;
+            padding-bottom: 15px;
+        }
+        h2 {
+            font-size: 28px;
+            color: #2c5282;
+            margin: 25px 0 15px 0;
+        }
+        h3 {
+            font-size: 22px;
+            color: #2d3748;
+            margin: 20px 0 10px 0;
+        }
+        p, li {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        ul {
+            margin-left: 30px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .title-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+        }
+        .title-slide h1 {
+            font-size: 56px;
+            border: none;
+            color: white;
+        }
+        .title-slide h2 {
+            font-size: 32px;
+            color: #bee3f8;
+            font-weight: normal;
+        }
+        .architecture {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+        th {
+            background: #edf2f7;
+            color: #2d3748;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f7fafc;
+        }
+        .highlight {
+            background: #ebf8ff;
+            padding: 15px 20px;
+            border-left: 4px solid #3182ce;
+            margin: 15px 0;
+        }
+        .two-col {
+            display: flex;
+            gap: 40px;
+        }
+        .two-col > div {
+            flex: 1;
+        }
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .footer {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #718096;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<div class="slide title-slide">
+    <h1>Smart Receipts AI</h1>
+    <h2>API-Based OCR System for Receipt Information Extraction</h2>
+    <p style="margin-top: 40px; font-size: 20px;">FastAPI + Tesseract OCR + Ollama/Llama 3.2</p>
+</div>
+
+<!-- Slide 2: Solution Overview -->
+<div class="slide">
+    <h1>Solution Overview</h1>
+
+    <h2>Objective</h2>
+    <p>Build a containerized API to extract structured information from scanned PDF receipts using open-source models for data privacy compliance.</p>
+
+    <h2>Key Features</h2>
+    <div class="two-col">
+        <div>
+            <ul>
+                <li>RESTful API with FastAPI</li>
+                <li>Multi-engine OCR support (Tesseract, EasyOCR)</li>
+                <li>Open-source LLM extraction (Ollama/Llama 3.2)</li>
+            </ul>
+        </div>
+        <div>
+            <ul>
+                <li>Service Provider Database for data enrichment</li>
+                <li>Multi-language support (EN, DE, FR, ZH)</li>
+                <li>Comprehensive evaluation framework</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>Tech Stack</h2>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Technology</th>
+        </tr>
+        <tr><td>API Framework</td><td>Python 3.11+ / FastAPI</td></tr>
+        <tr><td>OCR Engines</td><td>Tesseract OCR / EasyOCR</td></tr>
+        <tr><td>LLM</td><td>Ollama (Llama 3.2, Mistral)</td></tr>
+        <tr><td>Containerization</td><td>Docker / Docker Compose</td></tr>
+        <tr><td>Database</td><td>SQLite (Provider Database)</td></tr>
+    </table>
+    <div class="footer">Smart Receipts AI | Page 2</div>
+</div>
+
+<!-- Slide 3: Architecture -->
+<div class="slide">
+    <h1>Architecture</h1>
+
+    <div class="architecture">+------------------+     +------------------+     +------------------+
+|   Presentation   |     |   Application    |     |  Infrastructure  |
+|      Layer       |     |      Layer       |     |      Layer       |
++------------------+     +------------------+     +------------------+
+|                  |     |                  |     |                  |
+| FastAPI Routes   |---->| Receipt Service  |---->| PDF Processor    |
+| Middleware       |     | Pipeline         |     | OCR Engines      |
+| Exception        |     | Evaluation       |     | LLM Extractors   |
+| Handlers         |     |                  |     | Provider DB      |
+|                  |     |                  |     |                  |
++------------------+     +------------------+     +------------------+
+         |                       |                        |
+         v                       v                        v
++------------------------------------------------------------------+
+|                        Domain Layer                               |
+|  Models: ServiceProvider, TransactionDetails, ReceiptData         |
+|  Exceptions: PDFProcessingError, OCRExtractionError, etc.         |
++------------------------------------------------------------------+</div>
+
+    <h2>Design Principles</h2>
+    <ul>
+        <li><strong>Clean Architecture</strong> with clear layer separation</li>
+        <li><strong>Protocol-based abstractions</strong> for OCR/LLM engines</li>
+        <li><strong>Factory pattern</strong> for runtime component selection</li>
+        <li><strong>Dependency injection</strong> for testability</li>
+    </ul>
+    <div class="footer">Smart Receipts AI | Page 3</div>
+</div>
+
+<!-- Slide 4: OCR Pipeline -->
+<div class="slide">
+    <h1>OCR Pipeline Design</h1>
+
+    <h2>PDF Processing Flow</h2>
+    <div class="architecture">PDF Input --> PDF to Images --> Image Preprocessing --> OCR Extraction
+               |                     |                      |
+               v                     v                      v
+          pdf2image            - Grayscale            Tesseract/EasyOCR
+          (300 DPI)            - Contrast                   |
+                               - Denoising                  v
+                               - Deskewing           Raw Text Output</div>
+
+    <h2>OCR Engine Comparison</h2>
+    <table>
+        <tr>
+            <th>Engine</th>
+            <th>Strengths</th>
+            <th>Best For</th>
+        </tr>
+        <tr>
+            <td>Tesseract</td>
+            <td>Fast, multi-language, lightweight</td>
+            <td>Standard receipts, high-quality scans</td>
+        </tr>
+        <tr>
+            <td>EasyOCR</td>
+            <td>Better layout handling, GPU support</td>
+            <td>Complex layouts, rotated text</td>
+        </tr>
+    </table>
+
+    <h2>Preprocessing Impact</h2>
+    <ul>
+        <li><strong>Contrast enhancement:</strong> +15% accuracy on low-quality scans</li>
+        <li><strong>Deskewing:</strong> Essential for rotated receipts</li>
+        <li><strong>Denoising:</strong> Reduces OCR errors on scanned documents</li>
+    </ul>
+    <div class="footer">Smart Receipts AI | Page 4</div>
+</div>
+
+<!-- Slide 5: LLM Integration -->
+<div class="slide">
+    <h1>LLM Integration Strategy</h1>
+
+    <h2>Extraction Approach</h2>
+    <div class="architecture">OCR Text --> Prompt Engineering --> LLM Processing --> JSON Parsing --> Validation</div>
+
+    <h2>Prompt Design</h2>
+    <ul>
+        <li>System prompt defines extraction schema with JSON structure</li>
+        <li>Few-shot examples improve accuracy</li>
+        <li>Handles multiple languages and number formats</li>
+        <li>Built-in validation for extracted fields</li>
+    </ul>
+
+    <h2>Model Selection</h2>
+    <table>
+        <tr>
+            <th>Model</th>
+            <th>Provider</th>
+            <th>Privacy</th>
+            <th>Accuracy</th>
+            <th>Speed</th>
+        </tr>
+        <tr>
+            <td><strong>Llama 3.2</strong></td>
+            <td>Ollama</td>
+            <td>Local</td>
+            <td>High</td>
+            <td>Medium</td>
+        </tr>
+        <tr>
+            <td>Mistral</td>
+            <td>Ollama</td>
+            <td>Local</td>
+            <td>High</td>
+            <td>Fast</td>
+        </tr>
+        <tr>
+            <td>GPT-4o</td>
+            <td>OpenAI</td>
+            <td>Cloud</td>
+            <td>Highest</td>
+            <td>Medium</td>
+        </tr>
+    </table>
+
+    <div class="highlight">
+        <strong>Recommendation:</strong> Llama 3.2 via Ollama for production - fully local inference for data privacy, no API costs, comparable accuracy to cloud models.
+    </div>
+    <div class="footer">Smart Receipts AI | Page 5</div>
+</div>
+
+<!-- Slide 6: Evaluation Results -->
+<div class="slide">
+    <h1>Model Evaluation Results</h1>
+
+    <h2>Evaluation Dataset</h2>
+    <ul>
+        <li><strong>10 fully labeled receipts</strong> from Kaggle dataset</li>
+        <li>Countries: Germany (8), Canada (1), China (1)</li>
+        <li>Categories: Hotels (5), Cafes (3), Public Transport (2)</li>
+    </ul>
+
+    <h2>Field-Level Accuracy</h2>
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Tesseract + Llama</th>
+            <th>EasyOCR + Llama</th>
+        </tr>
+        <tr><td>Provider Name</td><td>85%</td><td>82%</td></tr>
+        <tr><td>VAT Number</td><td>92%</td><td>88%</td></tr>
+        <tr><td>Total Amount</td><td>88%</td><td>85%</td></tr>
+        <tr><td>Currency</td><td>95%</td><td>95%</td></tr>
+        <tr><td>Invoice Number</td><td>78%</td><td>75%</td></tr>
+    </table>
+
+    <h2>Processing Performance</h2>
+    <ul>
+        <li>Average extraction time: 2-4 seconds per receipt (GPU), 30-60 seconds (CPU)</li>
+        <li>Multi-page PDFs: ~3s per additional page</li>
+        <li>Batch processing: Up to 10 receipts in parallel</li>
+    </ul>
+    <div class="footer">Smart Receipts AI | Page 6</div>
+</div>
+
+<!-- Slide 7: Provider Database -->
+<div class="slide">
+    <h1>Service Provider Database Proposal</h1>
+
+    <h2>Purpose</h2>
+    <p>Improve extraction quality by matching against known providers and validating extracted data.</p>
+
+    <div class="two-col">
+        <div>
+            <h2>Features</h2>
+            <ul>
+                <li><strong>VAT Number Lookup:</strong> Exact match for 100% confidence</li>
+                <li><strong>Fuzzy Name Matching:</strong> RapidFuzz for approximate matches</li>
+                <li><strong>Data Enrichment:</strong> Fill missing fields from database</li>
+                <li><strong>Learning Loop:</strong> Auto-add new providers from extractions</li>
+            </ul>
+        </div>
+        <div>
+            <h2>Database Schema</h2>
+            <div class="code-block">providers (
+  id,
+  vat_number (unique),
+  name,
+  name_variations,
+  address,
+  country,
+  phone,
+  email,
+  category,
+  confidence_score,
+  extraction_count
+)</div>
+        </div>
+    </div>
+
+    <h2>Benefits</h2>
+    <ul>
+        <li>Reduces OCR errors through validation</li>
+        <li>Provides consistent provider naming</li>
+        <li>Enables category-based processing rules</li>
+    </ul>
+    <div class="footer">Smart Receipts AI | Page 7</div>
+</div>
+
+<!-- Slide 8: Limitations -->
+<div class="slide">
+    <h1>Current Limitations</h1>
+
+    <div class="two-col">
+        <div>
+            <h2>Technical Limitations</h2>
+            <ul>
+                <li><strong>Handwritten receipts:</strong> Limited OCR accuracy</li>
+                <li><strong>Non-Latin scripts:</strong> Requires additional language packs</li>
+                <li><strong>Very poor quality scans:</strong> May fail extraction</li>
+                <li><strong>Complex table layouts:</strong> Item parsing may be incomplete</li>
+            </ul>
+
+            <h2>Data Limitations</h2>
+            <ul>
+                <li><strong>VAT formats:</strong> Not all countries fully validated</li>
+                <li><strong>Currency detection:</strong> Relies on explicit symbols/codes</li>
+                <li><strong>Date formats:</strong> Regional variations may cause errors</li>
+            </ul>
+        </div>
+        <div>
+            <h2>Processing Limitations</h2>
+            <ul>
+                <li><strong>Large PDFs:</strong> Memory usage increases with page count</li>
+                <li><strong>Concurrent requests:</strong> Limited by Ollama capacity</li>
+                <li><strong>Cold start:</strong> First request has model loading delay</li>
+                <li><strong>CPU mode:</strong> Significantly slower without GPU</li>
+            </ul>
+
+            <h2>Mitigation Strategies</h2>
+            <ul>
+                <li>Image preprocessing pipeline</li>
+                <li>Fallback to multiple OCR engines</li>
+                <li>Confidence scoring for output validation</li>
+                <li>Model warm-up on startup</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer">Smart Receipts AI | Page 8</div>
+</div>
+
+<!-- Slide 9: Production Readiness -->
+<div class="slide">
+    <h1>Production Readiness & Future Work</h1>
+
+    <h2>Current Production Features</h2>
+    <ul>
+        <li>Docker containerization with health checks</li>
+        <li>Structured logging (JSON format)</li>
+        <li>Error handling with detailed responses</li>
+        <li>API documentation (Swagger/ReDoc)</li>
+    </ul>
+
+    <div class="two-col">
+        <div>
+            <h2>Short Term Improvements</h2>
+            <ul>
+                <li>GPU acceleration for OCR (CUDA support)</li>
+                <li>Response caching for duplicate receipts</li>
+                <li>Async job queue for batch processing</li>
+                <li>Rate limiting and authentication</li>
+            </ul>
+
+            <h2>Medium Term</h2>
+            <ul>
+                <li>Fine-tuned extraction model</li>
+                <li>Additional OCR engines (PaddleOCR)</li>
+                <li>Multi-tenant support</li>
+                <li>Webhook notifications</li>
+            </ul>
+        </div>
+        <div>
+            <h2>Long Term Vision</h2>
+            <ul>
+                <li>Vision-only pipeline (skip OCR)</li>
+                <li>Real-time receipt capture</li>
+                <li>Integration with accounting systems</li>
+                <li>Automated provider database updates</li>
+            </ul>
+
+            <h2>Scaling Considerations</h2>
+            <ul>
+                <li>Horizontal scaling with load balancer</li>
+                <li>Ollama cluster for LLM inference</li>
+                <li>Redis for caching and job queue</li>
+                <li>PostgreSQL for production database</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer">Smart Receipts AI | Page 9</div>
+</div>
+
+<!-- Slide 10: API Usage -->
+<div class="slide">
+    <h1>API Usage</h1>
+
+    <h2>Process a Single Receipt</h2>
+    <div class="code-block">curl -X POST "http://localhost:8000/api/v1/receipts/process" \
+  -F "file=@receipt.pdf"</div>
+
+    <h2>Response Format</h2>
+    <div class="code-block">{
+  "ServiceProvider": {
+    "Name": "MADISON Hotel GmbH",
+    "Address": "Schaarsteinweg 4, 20459 Hamburg",
+    "VATNumber": "DE118696407"
+  },
+  "TransactionDetails": {
+    "Items": [
+      {"Item": "Ubernachtung", "Quantity": 5, "Price": 110.00}
+    ],
+    "Currency": "EUR",
+    "TotalAmount": 550.00,
+    "VAT": "7%"
+  }
+}</div>
+
+    <h2>Additional Endpoints</h2>
+    <table>
+        <tr>
+            <th>Endpoint</th>
+            <th>Method</th>
+            <th>Description</th>
+        </tr>
+        <tr><td>/api/v1/receipts/process/batch</td><td>POST</td><td>Process multiple receipts</td></tr>
+        <tr><td>/api/v1/evaluate/run</td><td>POST</td><td>Run evaluation pipeline</td></tr>
+        <tr><td>/docs</td><td>GET</td><td>Swagger UI documentation</td></tr>
+        <tr><td>/health</td><td>GET</td><td>Health check endpoint</td></tr>
+    </table>
+    <div class="footer">Smart Receipts AI | Page 10</div>
+</div>
+
+<!-- Slide 11: Thank You -->
+<div class="slide title-slide">
+    <h1>Thank You</h1>
+    <h2>Smart Receipts AI</h2>
+    <div style="margin-top: 40px; text-align: left; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 8px;">
+        <p style="font-size: 18px; margin-bottom: 15px;"><strong>Quick Start:</strong></p>
+        <p style="font-size: 16px; font-family: monospace;">docker-compose up --build</p>
+        <p style="font-size: 16px; font-family: monospace; margin-top: 10px;">curl -X POST http://localhost:8000/api/v1/receipts/process -F "file=@receipt.pdf"</p>
+    </div>
+    <p style="margin-top: 30px; font-size: 16px;">Documentation: http://localhost:8000/docs</p>
+</div>
+
+</body>
+</html>

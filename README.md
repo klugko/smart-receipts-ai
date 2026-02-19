@@ -267,7 +267,7 @@ receipts/
 
 ## Presentation
 
-See `docs/PRESENTATION.pdf` (or `docs/PRESENTATION.md`) for slides covering:
+See `docs/PRESENTATION.html` (or `docs/PRESENTATION.md`) for slides covering:
 - Solution overview and architecture
 - Technical approach and pipeline design
 - Model evaluation results
