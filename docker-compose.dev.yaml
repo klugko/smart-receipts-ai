@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_MODEL=llama3.2
+      - OCR_ENGINE=tesseract
+      - TESSERACT_LANGUAGES=eng+deu+fra
+      - LOG_LEVEL=DEBUG
+      - LOG_FORMAT=console
+    volumes:
+      - ./app:/app/app:ro
+      - ./receipts:/app/receipts:ro
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

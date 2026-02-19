@@ -1,0 +1,11 @@
+# Optional: EasyOCR with PyTorch
+# Install with: pip install -r requirements-easyocr.txt
+
+-r requirements.txt
+
+# For CPU-only (no NVIDIA packages):
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+
+easyocr>=1.7.0,<2.0.0
