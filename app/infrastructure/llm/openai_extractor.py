@@ -2,14 +2,13 @@ import base64
 import io
 import json
 import re
-from typing import Optional
 
-from PIL import Image
 from openai import AsyncOpenAI
+from PIL import Image
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.domain.exceptions import LLMParsingError
-from app.infrastructure.llm.base import LLMExtractor, ExtractionResult
+from app.infrastructure.llm.base import ExtractionResult, LLMExtractor
 from app.infrastructure.llm.prompts import (
     EXTRACTION_SYSTEM_PROMPT,
     EXTRACTION_USER_PROMPT,
@@ -70,12 +69,12 @@ class OpenAIExtractor(LLMExtractor):
             raise LLMParsingError(
                 message="Failed to parse OpenAI response as JSON",
                 details={"error": str(e)},
-            )
+            ) from e
         except Exception as e:
             raise LLMParsingError(
                 message="OpenAI extraction failed",
                 details={"error": str(e)},
-            )
+            ) from e
 
     @retry(
         stop=stop_after_attempt(3),
@@ -128,7 +127,7 @@ class OpenAIExtractor(LLMExtractor):
             raise LLMParsingError(
                 message="OpenAI vision extraction failed",
                 details={"error": str(e)},
-            )
+            ) from e
 
     def _image_to_base64(self, image: Image.Image) -> str:
         """Convert PIL Image to base64 string."""

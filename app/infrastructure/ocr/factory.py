@@ -14,10 +14,13 @@ class OCREngineFactory:
             return TesseractOCR(**kwargs)
         elif engine_name == "easyocr":
             from app.infrastructure.ocr.easyocr_engine import EasyOCREngine
+
             return EasyOCREngine(**kwargs)
         else:
             available = cls.available_engines()
-            raise ValueError(f"Unknown OCR engine: {engine_name}. Available: {', '.join(available)}")
+            raise ValueError(
+                f"Unknown OCR engine: {engine_name}. Available: {', '.join(available)}"
+            )
 
     @classmethod
     def available_engines(cls) -> list[str]:
@@ -26,6 +29,7 @@ class OCREngineFactory:
 
         try:
             from app.infrastructure.ocr.easyocr_engine import is_easyocr_available
+
             if is_easyocr_available():
                 engines.append("easyocr")
         except ImportError:

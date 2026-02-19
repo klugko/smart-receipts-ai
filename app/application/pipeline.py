@@ -1,22 +1,27 @@
+from __future__ import annotations
+
 import time
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from PIL import Image
 
+if TYPE_CHECKING:
+    from app.infrastructure.database.service import ProviderMatchingService
+
 from app.domain.models import (
+    LineItem,
+    ProcessingMetadata,
     ReceiptData,
     ServiceProvider,
     TransactionDetails,
-    LineItem,
     VATDetail,
-    ProcessingMetadata,
 )
-from app.infrastructure.pdf.processor import PDFProcessor
+from app.infrastructure.llm.base import ExtractionResult, LLMExtractor
 from app.infrastructure.ocr.base import OCREngine, OCRResult
-from app.infrastructure.llm.base import LLMExtractor, ExtractionResult
+from app.infrastructure.pdf.processor import PDFProcessor
 
 
 class PipelineStrategy(str, Enum):
@@ -44,8 +49,8 @@ class ExtractionPipeline:
         pdf_processor: PDFProcessor,
         ocr_engine: OCREngine,
         llm_extractor: LLMExtractor,
-        config: Optional[PipelineConfig] = None,
-        provider_service: Optional["ProviderMatchingService"] = None,
+        config: PipelineConfig | None = None,
+        provider_service: ProviderMatchingService | None = None,
     ):
         self._pdf_processor = pdf_processor
         self._ocr_engine = ocr_engine
@@ -60,7 +65,7 @@ class ExtractionPipeline:
         images, native_text = self._pdf_processor.process(pdf_bytes)
         page_count = len(images)
 
-        ocr_result: Optional[OCRResult] = None
+        ocr_result: OCRResult | None = None
         extraction_result: ExtractionResult
 
         strategy = self._config.strategy
@@ -93,9 +98,7 @@ class ExtractionPipeline:
         if not self._provider_service:
             return receipt_data
 
-        enriched_provider = self._provider_service.enrich_provider(
-            receipt_data.service_provider
-        )
+        enriched_provider = self._provider_service.enrich_provider(receipt_data.service_provider)
 
         self._provider_service.learn_provider(enriched_provider)
 
@@ -144,8 +147,8 @@ class ExtractionPipeline:
     def _build_receipt_data(
         self,
         extraction_result: ExtractionResult,
-        ocr_result: Optional[OCRResult],
-        native_text: Optional[str],
+        ocr_result: OCRResult | None,
+        native_text: str | None,
         processing_time_ms: int,
         page_count: int,
     ) -> ReceiptData:
@@ -169,27 +172,31 @@ class ExtractionPipeline:
             if not item_data:
                 continue
             price = item_data.get("price") or item_data.get("total_price") or 0
-            items.append(LineItem(
-                name=item_data.get("name") or item_data.get("item") or "Unknown Item",
-                quantity=float(item_data.get("quantity") or 1),
-                price=float(price),
-                vat_rate=item_data.get("vat_rate"),
-            ))
+            items.append(
+                LineItem(
+                    name=item_data.get("name") or item_data.get("item") or "Unknown Item",
+                    quantity=float(item_data.get("quantity") or 1),
+                    price=float(price),
+                    vat_rate=item_data.get("vat_rate"),
+                )
+            )
 
         vat_details = []
         for vat_data in tx_data.get("vat_details", []):
             if not vat_data:
                 continue
-            vat_details.append(VATDetail(
-                rate=float(vat_data.get("rate") or 0),
-                net_amount=float(vat_data.get("net_amount") or 0),
-                vat_amount=float(vat_data.get("vat_amount") or 0),
-                gross_amount=float(vat_data.get("gross_amount") or 0),
-            ))
+            vat_details.append(
+                VATDetail(
+                    rate=float(vat_data.get("rate") or 0),
+                    net_amount=float(vat_data.get("net_amount") or 0),
+                    vat_amount=float(vat_data.get("vat_amount") or 0),
+                    gross_amount=float(vat_data.get("gross_amount") or 0),
+                )
+            )
 
         vat_str = None
         if vat_details:
-            rates = sorted(set(v.rate for v in vat_details))
+            rates = sorted({v.rate for v in vat_details})
             vat_str = " + ".join(f"{r}%" for r in rates)
         elif tx_data.get("vat"):
             vat_str = str(tx_data.get("vat"))
@@ -222,12 +229,14 @@ class ExtractionPipeline:
 
         confidence = None
         if ocr_result:
-            field_count = sum([
-                1 if service_provider.name != "Unknown" else 0,
-                1 if service_provider.vat_number else 0,
-                1 if transaction.total_amount > 0 else 0,
-                1 if transaction.items else 0,
-            ])
+            field_count = sum(
+                [
+                    1 if service_provider.name != "Unknown" else 0,
+                    1 if service_provider.vat_number else 0,
+                    1 if transaction.total_amount > 0 else 0,
+                    1 if transaction.items else 0,
+                ]
+            )
             confidence = min(1.0, (ocr_result.confidence + field_count * 0.15))
 
         metadata = ProcessingMetadata(

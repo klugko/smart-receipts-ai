@@ -1,14 +1,15 @@
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import MagicMock, AsyncMock
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.domain.models import (
+    ProcessingMetadata,
     ReceiptData,
     ServiceProvider,
     TransactionDetails,
-    ProcessingMetadata,
 )
+from app.main import app
 
 
 @pytest.fixture
@@ -97,23 +98,25 @@ def mock_llm_extractor():
     extractor = MagicMock()
     extractor.name = "mock_llm"
     extractor.supports_vision = False
-    extractor.extract_from_text = AsyncMock(return_value=ExtractionResult(
-        raw_response='{}',
-        parsed_data={
-            "service_provider": {"name": "Test Shop"},
-            "transaction": {"total_amount": 100, "currency": "EUR"},
-        },
-        model="mock_llm",
-        tokens_used=100,
-    ))
+    extractor.extract_from_text = AsyncMock(
+        return_value=ExtractionResult(
+            raw_response="{}",
+            parsed_data={
+                "service_provider": {"name": "Test Shop"},
+                "transaction": {"total_amount": 100, "currency": "EUR"},
+            },
+            model="mock_llm",
+            tokens_used=100,
+        )
+    )
     return extractor
 
 
 @pytest.fixture
 def mock_pdf_processor():
     """Create a mock PDF processor."""
-    from PIL import Image
     import numpy as np
+    from PIL import Image
 
     processor = MagicMock()
     processor.process.return_value = (

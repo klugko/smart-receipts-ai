@@ -1,15 +1,13 @@
-from typing import Annotated
-from enum import Enum
-from pathlib import Path
 import json
+from pathlib import Path
+from typing import Annotated, Any
 
-from fastapi import APIRouter, File, UploadFile, Query, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel
 
-from app.domain.models import ReceiptData, ReceiptResponse
 from app.application.services import ReceiptProcessingService
-from app.presentation.dependencies import get_receipt_service, get_provider_repository
-
+from app.domain.models import ReceiptData, ReceiptResponse
+from app.presentation.dependencies import get_provider_repository, get_receipt_service
 
 router = APIRouter(tags=["Receipts"])
 
@@ -29,23 +27,21 @@ router = APIRouter(tags=["Receipts"])
                         "ServiceProvider": {
                             "Name": "MADISON Hotel GmbH",
                             "Address": "Schaarsteinweg 4, 20459 Hamburg",
-                            "VATNumber": "DE118696407"
+                            "VATNumber": "DE118696407",
                         },
                         "TransactionDetails": {
-                            "Items": [
-                                {"Item": "Accommodation", "Quantity": 5, "Price": 550.0}
-                            ],
+                            "Items": [{"Item": "Accommodation", "Quantity": 5, "Price": 550.0}],
                             "Currency": "EUR",
                             "TotalAmount": 568.0,
-                            "VAT": "7% + 19%"
-                        }
+                            "VAT": "7% + 19%",
+                        },
                     }
                 }
-            }
+            },
         },
         400: {"description": "Invalid file type or format"},
-        422: {"description": "Processing error"}
-    }
+        422: {"description": "Processing error"},
+    },
 )
 async def process_receipt(
     file: Annotated[UploadFile, File(description="PDF receipt file to process")],
@@ -74,7 +70,9 @@ async def process_receipt(
 )
 async def process_receipt_detailed(
     file: Annotated[UploadFile, File(description="PDF receipt file to process")],
-    include_raw_text: Annotated[bool, Query(description="Include raw OCR text in response")] = False,
+    include_raw_text: Annotated[
+        bool, Query(description="Include raw OCR text in response")
+    ] = False,
     service: ReceiptProcessingService = Depends(get_receipt_service),
 ) -> ReceiptData:
     """Process receipt with full metadata."""
@@ -132,7 +130,9 @@ async def process_receipts_batch(
             errors.append({"filename": file.filename, "error": str(e)})
 
     if errors and not results:
-        raise HTTPException(status_code=422, detail={"message": "All files failed", "errors": errors})
+        raise HTTPException(
+            status_code=422, detail={"message": "All files failed", "errors": errors}
+        )
 
     return results
 
@@ -152,7 +152,7 @@ class EvaluationResult(BaseModel):
     failed: int
     average_accuracy: float
     average_processing_time_ms: float
-    results: list[dict]
+    results: list[dict[str, Any]]
 
 
 @router.post(
@@ -173,7 +173,7 @@ async def run_evaluation(
     with open(gt_path) as f:
         ground_truth = json.load(f)
 
-    results = []
+    results: list[dict[str, Any]] = []
     successful = 0
     total_accuracy = 0.0
     total_time = 0
@@ -182,11 +182,9 @@ async def run_evaluation(
         file_path = Path(receipt_info.get("file_path", ""))
 
         if not file_path.exists():
-            results.append({
-                "file_path": str(file_path),
-                "status": "skipped",
-                "reason": "File not found"
-            })
+            results.append(
+                {"file_path": str(file_path), "status": "skipped", "reason": "File not found"}
+            )
             continue
 
         try:
@@ -199,28 +197,26 @@ async def run_evaluation(
             gt = receipt_info.get("ground_truth", {})
             accuracy = _calculate_accuracy(gt, extracted)
 
-            results.append({
-                "file_path": str(file_path),
-                "status": "success",
-                "accuracy": accuracy,
-                "processing_time_ms": extracted.metadata.processing_time_ms,
-                "extracted": {
-                    "provider_name": extracted.service_provider.name,
-                    "total_amount": extracted.transaction.total_amount,
-                    "currency": extracted.transaction.currency,
+            results.append(
+                {
+                    "file_path": str(file_path),
+                    "status": "success",
+                    "accuracy": accuracy,
+                    "processing_time_ms": extracted.metadata.processing_time_ms,
+                    "extracted": {
+                        "provider_name": extracted.service_provider.name,
+                        "total_amount": extracted.transaction.total_amount,
+                        "currency": extracted.transaction.currency,
+                    },
                 }
-            })
+            )
 
             successful += 1
             total_accuracy += accuracy
             total_time += extracted.metadata.processing_time_ms
 
         except Exception as e:
-            results.append({
-                "file_path": str(file_path),
-                "status": "failed",
-                "error": str(e)
-            })
+            results.append({"file_path": str(file_path), "status": "failed", "error": str(e)})
 
     return EvaluationResult(
         total_receipts=len(ground_truth.get("receipts", [])),

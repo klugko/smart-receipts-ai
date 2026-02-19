@@ -1,10 +1,8 @@
 import structlog
-from typing import BinaryIO
 
-from app.domain.models import ReceiptData
-from app.domain.exceptions import UnsupportedFileTypeError, ReceiptProcessingError
 from app.application.pipeline import ExtractionPipeline
-
+from app.domain.exceptions import ReceiptProcessingError, UnsupportedFileTypeError
+from app.domain.models import ReceiptData
 
 logger = structlog.get_logger(__name__)
 
@@ -75,7 +73,7 @@ class ReceiptProcessingService:
             raise ReceiptProcessingError(
                 message="Failed to process receipt",
                 details={"filename": filename, "error": str(e)},
-            )
+            ) from e
 
     def _validate_file(
         self,
@@ -86,7 +84,7 @@ class ReceiptProcessingService:
         """Validate uploaded file."""
         if len(content) > self.MAX_FILE_SIZE_BYTES:
             raise UnsupportedFileTypeError(
-                message=f"File exceeds maximum size of {self.MAX_FILE_SIZE_BYTES // (1024*1024)}MB",
+                message=f"File exceeds maximum size of {self.MAX_FILE_SIZE_BYTES // (1024 * 1024)}MB",
                 details={"size": len(content), "max_size": self.MAX_FILE_SIZE_BYTES},
             )
 

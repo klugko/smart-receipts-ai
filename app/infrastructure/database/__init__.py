@@ -1,4 +1,4 @@
-from app.infrastructure.database.models import Provider, Base
+from app.infrastructure.database.models import Base, Provider
 from app.infrastructure.database.repository import ProviderRepository
 from app.infrastructure.database.service import ProviderMatchingService
 

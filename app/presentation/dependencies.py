@@ -1,23 +1,22 @@
 from functools import lru_cache
-from typing import Optional
 
-from app.config import settings
-from app.infrastructure.pdf.processor import PDFProcessor
-from app.infrastructure.ocr.factory import OCREngineFactory
-from app.infrastructure.llm.factory import LLMExtractorFactory
-from app.infrastructure.database.repository import ProviderRepository
-from app.infrastructure.database.service import ProviderMatchingService
 from app.application.pipeline import ExtractionPipeline, PipelineConfig
 from app.application.services import ReceiptProcessingService
+from app.config import settings
+from app.infrastructure.database.repository import ProviderRepository
+from app.infrastructure.database.service import ProviderMatchingService
+from app.infrastructure.llm.factory import LLMExtractorFactory
+from app.infrastructure.ocr.factory import OCREngineFactory
+from app.infrastructure.pdf.processor import PDFProcessor
 
 
-@lru_cache()
+@lru_cache
 def get_pdf_processor() -> PDFProcessor:
     """Get or create PDF processor instance."""
     return PDFProcessor(dpi=300, grayscale=True)
 
 
-@lru_cache()
+@lru_cache
 def get_ocr_engine():
     """Get or create OCR engine instance."""
     engine_name = settings.ocr_engine
@@ -30,7 +29,7 @@ def get_ocr_engine():
     elif engine_name == "easyocr":
         languages = settings.tesseract_languages.split("+")
         lang_map = {"eng": "en", "deu": "de", "fra": "fr"}
-        mapped_langs = [lang_map.get(l, l) for l in languages]
+        mapped_langs = [lang_map.get(lang, lang) for lang in languages]
         return OCREngineFactory.create(
             engine_name,
             languages=mapped_langs,
@@ -54,16 +53,16 @@ def get_llm_extractor():
     )
 
 
-@lru_cache()
-def get_provider_repository() -> Optional[ProviderRepository]:
+@lru_cache
+def get_provider_repository() -> ProviderRepository | None:
     """Get provider repository if enabled."""
     if not settings.enable_provider_database:
         return None
     return ProviderRepository(settings.database_url)
 
 
-@lru_cache()
-def get_provider_service() -> Optional[ProviderMatchingService]:
+@lru_cache
+def get_provider_service() -> ProviderMatchingService | None:
     """Get provider matching service if enabled."""
     repo = get_provider_repository()
     if repo is None:

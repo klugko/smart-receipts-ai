@@ -2,11 +2,11 @@ import io
 from pathlib import Path
 from typing import BinaryIO
 
-import numpy as np
-from PIL import Image
 import cv2
+import numpy as np
 import pdfplumber
 from pdf2image import convert_from_bytes
+from PIL import Image
 
 from app.domain.exceptions import PDFProcessingError
 
@@ -47,7 +47,7 @@ class PDFProcessor:
             raise PDFProcessingError(
                 message="Failed to convert PDF to images",
                 details={"error": str(e)},
-            )
+            ) from e
 
     def preprocess_image(self, image: Image.Image) -> Image.Image:
         """Apply preprocessing to improve OCR accuracy."""
@@ -73,7 +73,9 @@ class PDFProcessor:
                 center = (w // 2, h // 2)
                 rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
                 enhanced = cv2.warpAffine(
-                    enhanced, rotation_matrix, (w, h),
+                    enhanced,
+                    rotation_matrix,
+                    (w, h),
                     flags=cv2.INTER_CUBIC,
                     borderMode=cv2.BORDER_REPLICATE,
                 )

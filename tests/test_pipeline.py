@@ -1,25 +1,23 @@
-import pytest
-from unittest.mock import MagicMock, AsyncMock, patch
-from PIL import Image
+from unittest.mock import AsyncMock, MagicMock
+
 import numpy as np
+import pytest
+from PIL import Image
 
 from app.application.pipeline import (
     ExtractionPipeline,
     PipelineConfig,
     PipelineStrategy,
 )
-from app.infrastructure.ocr.base import OCRResult
-from app.infrastructure.llm.base import ExtractionResult
 from app.domain.models import ServiceProvider
+from app.infrastructure.llm.base import ExtractionResult
+from app.infrastructure.ocr.base import OCRResult
 
 
 @pytest.fixture
 def mock_pdf_processor():
     processor = MagicMock()
-    processor.process.return_value = (
-        [Image.fromarray(np.zeros((100, 100), dtype=np.uint8))],
-        None
-    )
+    processor.process.return_value = ([Image.fromarray(np.zeros((100, 100), dtype=np.uint8))], None)
     return processor
 
 
@@ -41,28 +39,30 @@ def mock_llm_extractor():
     extractor = MagicMock()
     extractor.name = "test_llm"
     extractor.supports_vision = False
-    extractor.extract_from_text = AsyncMock(return_value=ExtractionResult(
-        raw_response='{"service_provider": {"name": "Test Shop"}, "transaction": {"total_amount": 100}}',
-        parsed_data={
-            "service_provider": {
-                "name": "Test Shop",
-                "address": "123 Test St",
-                "vat_number": "DE123456789",
-                "country": "DE"
+    extractor.extract_from_text = AsyncMock(
+        return_value=ExtractionResult(
+            raw_response='{"service_provider": {"name": "Test Shop"}, "transaction": {"total_amount": 100}}',
+            parsed_data={
+                "service_provider": {
+                    "name": "Test Shop",
+                    "address": "123 Test St",
+                    "vat_number": "DE123456789",
+                    "country": "DE",
+                },
+                "transaction": {
+                    "items": [{"name": "Item 1", "quantity": 1, "total_price": 100}],
+                    "currency": "EUR",
+                    "total_amount": 100.0,
+                    "vat_details": [],
+                    "payment_method": "Card",
+                    "transaction_date": "2024-01-15",
+                    "invoice_number": "INV-001",
+                },
             },
-            "transaction": {
-                "items": [{"name": "Item 1", "quantity": 1, "total_price": 100}],
-                "currency": "EUR",
-                "total_amount": 100.0,
-                "vat_details": [],
-                "payment_method": "Card",
-                "transaction_date": "2024-01-15",
-                "invoice_number": "INV-001"
-            }
-        },
-        model="test_llm",
-        tokens_used=100,
-    ))
+            model="test_llm",
+            tokens_used=100,
+        )
+    )
     return extractor
 
 
@@ -107,7 +107,7 @@ class TestExtractionPipeline:
     ):
         mock_pdf_processor.process.return_value = (
             [Image.fromarray(np.zeros((100, 100), dtype=np.uint8))],
-            "Native PDF text content that is long enough"
+            "Native PDF text content that is long enough",
         )
 
         pipeline = ExtractionPipeline(
@@ -117,7 +117,7 @@ class TestExtractionPipeline:
             config=PipelineConfig(strategy=PipelineStrategy.HYBRID),
         )
 
-        result = await pipeline.process(b"%PDF-1.4 test")
+        await pipeline.process(b"%PDF-1.4 test")
 
         mock_llm_extractor.extract_from_text.assert_called_once()
         assert "Native PDF text" in mock_llm_extractor.extract_from_text.call_args[0][0]
@@ -146,7 +146,7 @@ class TestExtractionPipeline:
                 Image.fromarray(np.zeros((100, 100), dtype=np.uint8)),
                 Image.fromarray(np.zeros((100, 100), dtype=np.uint8)),
             ],
-            None
+            None,
         )
 
         pipeline = ExtractionPipeline(
@@ -203,20 +203,20 @@ class TestExtractionPipeline:
 
 class TestPipelineVisionStrategy:
     @pytest.mark.asyncio
-    async def test_vision_strategy_single_page(
-        self, mock_pdf_processor, mock_ocr_engine
-    ):
+    async def test_vision_strategy_single_page(self, mock_pdf_processor, mock_ocr_engine):
         mock_llm = MagicMock()
         mock_llm.name = "vision_llm"
         mock_llm.supports_vision = True
-        mock_llm.extract_from_image = AsyncMock(return_value=ExtractionResult(
-            raw_response="{}",
-            parsed_data={
-                "service_provider": {"name": "Vision Shop"},
-                "transaction": {"total_amount": 50}
-            },
-            model="vision_llm",
-        ))
+        mock_llm.extract_from_image = AsyncMock(
+            return_value=ExtractionResult(
+                raw_response="{}",
+                parsed_data={
+                    "service_provider": {"name": "Vision Shop"},
+                    "transaction": {"total_amount": 50},
+                },
+                model="vision_llm",
+            )
+        )
 
         pipeline = ExtractionPipeline(
             pdf_processor=mock_pdf_processor,
@@ -243,7 +243,7 @@ class TestPipelineVisionStrategy:
             config=PipelineConfig(strategy=PipelineStrategy.VISION_LLM),
         )
 
-        result = await pipeline.process(b"%PDF-1.4 test")
+        await pipeline.process(b"%PDF-1.4 test")
 
         mock_ocr_engine.extract_text_batch.assert_called_once()
         mock_llm_extractor.extract_from_text.assert_called_once()

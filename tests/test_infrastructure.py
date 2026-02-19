@@ -1,14 +1,15 @@
-import pytest
-from unittest.mock import MagicMock, patch, AsyncMock
-from PIL import Image
-import numpy as np
+from unittest.mock import MagicMock, patch
 
+import numpy as np
+import pytest
+from PIL import Image
+
+from app.domain.exceptions import OCRExtractionError
+from app.infrastructure.llm.base import ExtractionResult
+from app.infrastructure.llm.factory import LLMExtractorFactory
 from app.infrastructure.ocr.base import OCREngine, OCRResult
 from app.infrastructure.ocr.factory import OCREngineFactory
-from app.infrastructure.llm.base import LLMExtractor, ExtractionResult
-from app.infrastructure.llm.factory import LLMExtractorFactory
 from app.infrastructure.pdf.processor import PDFProcessor
-from app.domain.exceptions import OCRExtractionError, LLMParsingError
 
 
 class TestOCRResult:
@@ -100,10 +101,7 @@ class TestLLMExtractorFactory:
         assert "ollama" in extractor.name
 
     def test_create_ollama_with_host(self):
-        extractor = LLMExtractorFactory.create_ollama(
-            model="llama3.2",
-            host="http://custom:11434"
-        )
+        extractor = LLMExtractorFactory.create_ollama(model="llama3.2", host="http://custom:11434")
         assert extractor.name == "ollama/llama3.2"
 
     def test_create_unknown_provider_raises(self):

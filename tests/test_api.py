@@ -1,15 +1,15 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi.testclient import TestClient
-from datetime import datetime
 
-from app.main import app
+import pytest
+from fastapi.testclient import TestClient
+
 from app.domain.models import (
+    ProcessingMetadata,
     ReceiptData,
     ServiceProvider,
     TransactionDetails,
-    ProcessingMetadata,
 )
+from app.main import app
 
 
 @pytest.fixture
@@ -141,8 +141,7 @@ class TestBatchProcessEndpoint:
 
     def test_batch_too_many_files(self, client, sample_pdf_bytes):
         files = [
-            ("files", (f"test_{i}.pdf", sample_pdf_bytes, "application/pdf"))
-            for i in range(11)
+            ("files", (f"test_{i}.pdf", sample_pdf_bytes, "application/pdf")) for i in range(11)
         ]
         response = client.post(
             "/api/v1/receipts/process/batch",

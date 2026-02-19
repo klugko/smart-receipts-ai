@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class ServiceProvider(BaseModel):
@@ -9,15 +9,15 @@ class ServiceProvider(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     name: str = Field(..., alias="Name", description="Name of the service provider")
-    address: Optional[str] = Field(None, alias="Address", description="Complete address")
-    vat_number: Optional[str] = Field(None, alias="VATNumber", description="VAT registration number")
-    country: Optional[str] = Field(None, description="Country code (ISO 3166-1 alpha-2)")
-    phone: Optional[str] = Field(None, description="Contact phone number")
-    email: Optional[str] = Field(None, description="Contact email address")
+    address: str | None = Field(None, alias="Address", description="Complete address")
+    vat_number: str | None = Field(None, alias="VATNumber", description="VAT registration number")
+    country: str | None = Field(None, description="Country code (ISO 3166-1 alpha-2)")
+    phone: str | None = Field(None, description="Contact phone number")
+    email: str | None = Field(None, description="Contact email address")
 
     @field_validator("vat_number", mode="before")
     @classmethod
-    def normalize_vat(cls, v: Optional[str]) -> Optional[str]:
+    def normalize_vat(cls, v: str | None) -> str | None:
         if v is None:
             return None
         return v.replace(" ", "").upper()
@@ -31,7 +31,7 @@ class LineItem(BaseModel):
     name: str = Field(..., alias="Item", description="Item description")
     quantity: float = Field(1.0, alias="Quantity", ge=0, description="Quantity purchased")
     price: float = Field(..., alias="Price", ge=0, description="Price for this item")
-    vat_rate: Optional[float] = Field(None, description="VAT rate percentage")
+    vat_rate: float | None = Field(None, description="VAT rate percentage")
 
 
 class VATDetail(BaseModel):
@@ -48,14 +48,18 @@ class TransactionDetails(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    items: list[LineItem] = Field(default_factory=list, alias="Items", description="List of purchased items")
-    currency: str = Field("EUR", alias="Currency", min_length=3, max_length=3, description="ISO 4217 currency code")
+    items: list[LineItem] = Field(
+        default_factory=list, alias="Items", description="List of purchased items"
+    )
+    currency: str = Field(
+        "EUR", alias="Currency", min_length=3, max_length=3, description="ISO 4217 currency code"
+    )
     total_amount: float = Field(..., alias="TotalAmount", ge=0, description="Total charged amount")
-    vat: Optional[str] = Field(None, alias="VAT", description="VAT information")
+    vat: str | None = Field(None, alias="VAT", description="VAT information")
     vat_details: list[VATDetail] = Field(default_factory=list, description="VAT breakdown by rate")
-    payment_method: Optional[str] = Field(None, description="Payment method used")
-    transaction_date: Optional[datetime] = Field(None, description="Date of transaction")
-    invoice_number: Optional[str] = Field(None, description="Invoice or receipt number")
+    payment_method: str | None = Field(None, description="Payment method used")
+    transaction_date: datetime | None = Field(None, description="Date of transaction")
+    invoice_number: str | None = Field(None, description="Invoice or receipt number")
 
     @field_validator("currency", mode="before")
     @classmethod
@@ -69,10 +73,12 @@ class ProcessingMetadata(BaseModel):
     ocr_engine: str = Field(..., description="OCR engine used")
     llm_model: str = Field(..., description="LLM model used for extraction")
     processing_time_ms: int = Field(..., ge=0, description="Total processing time in milliseconds")
-    ocr_confidence: Optional[float] = Field(None, ge=0, le=1, description="OCR confidence score")
-    extraction_confidence: Optional[float] = Field(None, ge=0, le=1, description="Overall extraction confidence")
+    ocr_confidence: float | None = Field(None, ge=0, le=1, description="OCR confidence score")
+    extraction_confidence: float | None = Field(
+        None, ge=0, le=1, description="Overall extraction confidence"
+    )
     page_count: int = Field(1, ge=1, description="Number of pages processed")
-    language_detected: Optional[str] = Field(None, description="Detected language code")
+    language_detected: str | None = Field(None, description="Detected language code")
 
 
 class ReceiptResponse(BaseModel):
@@ -85,19 +91,19 @@ class ReceiptResponse(BaseModel):
                 "ServiceProvider": {
                     "Name": "Shop XYZ",
                     "Address": "123 Main Street, City, State, ZIP",
-                    "VATNumber": "VAT123456"
+                    "VATNumber": "VAT123456",
                 },
                 "TransactionDetails": {
                     "Items": [
                         {"Item": "Product 1", "Quantity": 2, "Price": 9.99},
-                        {"Item": "Product 2", "Quantity": 1, "Price": 19.99}
+                        {"Item": "Product 2", "Quantity": 1, "Price": 19.99},
                     ],
                     "Currency": "USD",
                     "TotalAmount": 39.97,
-                    "VAT": "5%"
-                }
+                    "VAT": "5%",
+                },
             }
-        }
+        },
     )
 
     service_provider: ServiceProvider = Field(..., alias="ServiceProvider")
@@ -109,7 +115,7 @@ class ReceiptData(BaseModel):
 
     service_provider: ServiceProvider
     transaction: TransactionDetails
-    raw_text: Optional[str] = Field(None, description="Raw OCR text output")
+    raw_text: str | None = Field(None, description="Raw OCR text output")
     metadata: ProcessingMetadata
 
     def to_response(self) -> ReceiptResponse:

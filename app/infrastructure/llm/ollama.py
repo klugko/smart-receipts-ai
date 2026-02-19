@@ -5,7 +5,7 @@ import ollama
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.domain.exceptions import LLMParsingError
-from app.infrastructure.llm.base import LLMExtractor, ExtractionResult
+from app.infrastructure.llm.base import ExtractionResult, LLMExtractor
 from app.infrastructure.llm.prompts import EXTRACTION_SYSTEM_PROMPT, EXTRACTION_USER_PROMPT
 
 
@@ -61,12 +61,12 @@ class OllamaExtractor(LLMExtractor):
             raise LLMParsingError(
                 message="Failed to parse LLM response as JSON",
                 details={"error": str(e), "response": raw_response[:500]},
-            )
+            ) from e
         except Exception as e:
             raise LLMParsingError(
                 message="Ollama extraction failed",
                 details={"error": str(e)},
-            )
+            ) from e
 
     def _parse_response(self, response: str) -> dict:
         """Parse and validate LLM response."""

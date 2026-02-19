@@ -63,7 +63,7 @@ class TesseractOCR(OCREngine):
             raise OCRExtractionError(
                 message="Tesseract OCR extraction failed",
                 details={"error": str(e)},
-            )
+            ) from e
 
     def _detect_language(self, image: Image.Image) -> str | None:
         """Attempt to detect the language of the document."""

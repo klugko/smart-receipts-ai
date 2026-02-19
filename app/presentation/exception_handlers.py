@@ -1,15 +1,14 @@
+import structlog
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-import structlog
 
 from app.domain.exceptions import (
-    ReceiptProcessingError,
-    PDFProcessingError,
-    OCRExtractionError,
     LLMParsingError,
+    OCRExtractionError,
+    PDFProcessingError,
+    ReceiptProcessingError,
     UnsupportedFileTypeError,
 )
-
 
 logger = structlog.get_logger(__name__)
 

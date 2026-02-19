@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from rapidfuzz import fuzz, process
 
 from app.domain.models import ServiceProvider
-from app.infrastructure.database.repository import ProviderRepository
 from app.infrastructure.database.models import Provider
+from app.infrastructure.database.repository import ProviderRepository
 
 
 @dataclass
@@ -39,7 +38,7 @@ class ProviderMatchingService:
         self,
         extracted: ServiceProvider,
         min_confidence: float = 0.7,
-    ) -> Optional[MatchResult]:
+    ) -> MatchResult | None:
         """Match extracted provider against database."""
         if extracted.vat_number:
             db_provider = self._repository.get_by_vat(extracted.vat_number)
@@ -77,7 +76,7 @@ class ProviderMatchingService:
     def enrich_provider(
         self,
         extracted: ServiceProvider,
-        match_result: Optional[MatchResult] = None,
+        match_result: MatchResult | None = None,
     ) -> ServiceProvider:
         """Enrich extracted provider with database information."""
         if match_result is None:
@@ -99,7 +98,7 @@ class ProviderMatchingService:
 
         return enriched
 
-    def validate_vat_format(self, vat_number: str, country: Optional[str] = None) -> bool:
+    def validate_vat_format(self, vat_number: str, country: str | None = None) -> bool:
         """Validate VAT number format."""
         import re
 
@@ -116,7 +115,7 @@ class ProviderMatchingService:
 
         return False
 
-    def learn_provider(self, extracted: ServiceProvider) -> Optional[Provider]:
+    def learn_provider(self, extracted: ServiceProvider) -> Provider | None:
         """Add or update provider in database from extraction."""
         if not extracted.vat_number or not extracted.name:
             return None

@@ -1,11 +1,12 @@
-import pytest
 import tempfile
 from pathlib import Path
 
-from app.infrastructure.database.models import Provider, Base
+import pytest
+
+from app.domain.models import ServiceProvider
+from app.infrastructure.database.models import Provider
 from app.infrastructure.database.repository import ProviderRepository
 from app.infrastructure.database.service import ProviderMatchingService
-from app.domain.models import ServiceProvider
 
 
 @pytest.fixture
@@ -116,11 +117,7 @@ class TestProviderRepository:
 
     def test_upsert_fills_missing_address(self, repository):
         repository.upsert(vat_number="DE123", name="Company")
-        provider = repository.upsert(
-            vat_number="DE123",
-            name="Company",
-            address="New Address"
-        )
+        provider = repository.upsert(vat_number="DE123", name="Company", address="New Address")
         assert provider.address == "New Address"
 
     def test_seed_from_extractions(self, repository):
@@ -136,11 +133,13 @@ class TestProviderRepository:
 
 class TestProviderMatchingService:
     def test_match_by_vat_exact(self, matching_service, repository):
-        repository.create(Provider(
-            vat_number="DE123456789",
-            name="MADISON Hotel",
-            country="DE",
-        ))
+        repository.create(
+            Provider(
+                vat_number="DE123456789",
+                name="MADISON Hotel",
+                country="DE",
+            )
+        )
 
         extracted = ServiceProvider(
             name="Madison Hotel",
@@ -153,10 +152,12 @@ class TestProviderMatchingService:
         assert match.match_type == "vat_exact"
 
     def test_match_by_name_fuzzy(self, matching_service, repository):
-        repository.create(Provider(
-            vat_number="DE123",
-            name="MADISON Hotel GmbH",
-        ))
+        repository.create(
+            Provider(
+                vat_number="DE123",
+                name="MADISON Hotel GmbH",
+            )
+        )
 
         extracted = ServiceProvider(
             name="Madison Hotel",
@@ -173,13 +174,15 @@ class TestProviderMatchingService:
         assert match is None
 
     def test_enrich_provider(self, matching_service, repository):
-        repository.create(Provider(
-            vat_number="DE123456789",
-            name="Full Company Name",
-            address="123 Full Address",
-            country="DE",
-            phone="+49123456",
-        ))
+        repository.create(
+            Provider(
+                vat_number="DE123456789",
+                name="Full Company Name",
+                address="123 Full Address",
+                country="DE",
+                phone="+49123456",
+            )
+        )
 
         extracted = ServiceProvider(
             name="Company",
@@ -192,11 +195,13 @@ class TestProviderMatchingService:
         assert enriched.phone == "+49123456"
 
     def test_enrich_keeps_extracted_values(self, matching_service, repository):
-        repository.create(Provider(
-            vat_number="DE123456789",
-            name="Database Name",
-            address="Database Address",
-        ))
+        repository.create(
+            Provider(
+                vat_number="DE123456789",
+                name="Database Name",
+                address="Database Address",
+            )
+        )
 
         extracted = ServiceProvider(
             name="Extracted Name",

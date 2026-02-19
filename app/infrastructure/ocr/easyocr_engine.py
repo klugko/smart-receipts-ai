@@ -1,11 +1,12 @@
-from PIL import Image
 import numpy as np
+from PIL import Image
 
 from app.domain.exceptions import OCRExtractionError
 from app.infrastructure.ocr.base import OCREngine, OCRResult
 
 try:
     import easyocr
+
     EASYOCR_AVAILABLE = True
 except ImportError:
     EASYOCR_AVAILABLE = False
@@ -58,7 +59,7 @@ class EasyOCREngine(OCREngine):
             text_parts = []
             confidences = []
 
-            for bbox, text, confidence in results:
+            for _bbox, text, confidence in results:
                 if text.strip():
                     text_parts.append(text)
                     confidences.append(confidence)
@@ -76,7 +77,7 @@ class EasyOCREngine(OCREngine):
             raise OCRExtractionError(
                 message="EasyOCR extraction failed",
                 details={"error": str(e)},
-            )
+            ) from e
 
 
 def is_easyocr_available() -> bool:

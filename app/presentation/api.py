@@ -1,13 +1,12 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.presentation.routes import router
-from app.presentation.middleware import LoggingMiddleware
 from app.presentation.exception_handlers import register_exception_handlers
-from app.config import settings
+from app.presentation.middleware import LoggingMiddleware
+from app.presentation.routes import router
 
 
 @asynccontextmanager

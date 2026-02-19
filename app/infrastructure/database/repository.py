@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 
 from sqlalchemy import create_engine, select
@@ -20,7 +20,7 @@ class ProviderRepository:
         self._engine = create_engine(database_url, echo=False)
         Base.metadata.create_all(self._engine)
 
-    def get_by_vat(self, vat_number: str) -> Optional[Provider]:
+    def get_by_vat(self, vat_number: str) -> Provider | None:
         """Find provider by VAT number."""
         normalized_vat = vat_number.replace(" ", "").upper()
         with Session(self._engine) as session:
@@ -65,9 +65,9 @@ class ProviderRepository:
         self,
         vat_number: str,
         name: str,
-        address: Optional[str] = None,
-        country: Optional[str] = None,
-        category: Optional[str] = None,
+        address: str | None = None,
+        country: str | None = None,
+        category: str | None = None,
     ) -> Provider:
         """Insert or update a provider."""
         existing = self.get_by_vat(vat_number)

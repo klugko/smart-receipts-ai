@@ -1,3 +1,5 @@
+from typing import Any
+
 import structlog
 
 from app.config import settings
@@ -6,7 +8,7 @@ from app.presentation.api import create_app
 
 def configure_logging() -> None:
     """Configure structured logging."""
-    processors = [
+    processors: list[Any] = [
         structlog.contextvars.merge_contextvars,
         structlog.processors.add_log_level,
         structlog.processors.TimeStamper(fmt="iso"),
